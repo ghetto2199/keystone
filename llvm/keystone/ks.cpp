@@ -18,7 +18,7 @@
 
 #include "ks_priv.h"
 
-using namespace llvm;
+using namespace llvm_ks;
 
 
 KEYSTONE_EXPORT
@@ -198,9 +198,9 @@ static ks_err InitKs(int arch, ks_engine *ks, std::string TripleName)
     if (!initialized) {
         initialized = true;
         // Initialize targets and assembly parsers.
-        llvm::InitializeAllTargetInfos();
-        llvm::InitializeAllTargetMCs();
-        llvm::InitializeAllAsmParsers();
+        llvm_ks::InitializeAllTargetInfos();
+        llvm_ks::InitializeAllTargetMCs();
+        llvm_ks::InitializeAllAsmParsers();
     }
 
     ks->TripleName = Triple::normalize(TripleName);
@@ -482,6 +482,9 @@ ks_err ks_open(ks_arch arch, int mode, ks_engine **result)
 KEYSTONE_EXPORT
 ks_err ks_close(ks_engine *ks)
 {
+    if (!ks)
+        return KS_ERR_HANDLE;
+
     delete ks->STI;
     delete ks->MCII;
     delete ks->MAI;
