@@ -27,6 +27,10 @@ if (POLICY CMP0051)
   cmake_policy(SET CMP0051 OLD)
 endif()
 
+if (POLICY CMP0063)
+  set(CMAKE_POLICY_DEFAULT_CMP0063 NEW) # automatic when 3.3.2 is required
+endif()
+
 if (CMAKE_VERSION VERSION_LESS 3.1.20141117)
   set(cmake_3_2_USES_TERMINAL)
 else()
@@ -38,6 +42,16 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /EHsc")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /EHsc")
+else()
+    set(CMAKE_C_VISIBILITY_PRESET hidden)
+    set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+
+    # Use GNUInstallDirs to set LLVM_LIBDIR_SUFFIX. This should automatically
+    # handle cases where the libdir should be lib/, lib64/, or lib/<arch>/
+    # depending on the target system and cmake options.
+    include(GNUInstallDirs)
+    string(REGEX REPLACE "lib(.*)$" "\\1" LLVM_LIBDIR_SUFFIX "${CMAKE_INSTALL_LIBDIR}")
+    set(LLVM_LIBDIR_SUFFIX "${LLVM_LIBDIR_SUFFIX}" CACHE STRING "Define suffix of library directory name (32/64)")
 endif()
 
 # Force static runtime libraries
